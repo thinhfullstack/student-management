@@ -1,19 +1,18 @@
-let fullNameElm = document.querySelector('#fullname')
-let emailElm    = document.querySelector('#email')
-let phoneElm    = document.querySelector('#phone')
-let maleElm     = document.querySelector('#male')
-let famaleElm   = document.querySelector('#famale')
-let gender      = ''
+const fullNameElm = document.querySelector('#fullname')
+const emailElm    = document.querySelector('#email')
+const phoneElm    = document.querySelector('#phone')
+const maleElm     = document.querySelector('#male')
+const famaleElm   = document.querySelector('#famale')
 
-let btnSave     = document.querySelector('#btnSave')
+const btnSave     = document.querySelector('#btnSave')
 
-let errorName   = document.querySelector('#fullname-error')
-let errorEmail  = document.querySelector('#email-error')
-let errorPhone  = document.querySelector('#phone-error')
-let errorGender = document.querySelector('#gender-error')
+const errorName   = document.querySelector('#fullname-error')
+const errorEmail  = document.querySelector('#email-error')
+const errorPhone  = document.querySelector('#phone-error')
+const errorGender = document.querySelector('#gender-error')
 
 const validateEmail = (email) => {
-    return /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)
+    return /^(([^<a>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)
 };
 
 const validatePhone = (phone) => {
@@ -30,6 +29,7 @@ const App = {
             event.preventDefault()
 
             // check checked
+            let gender = ''
             if(maleElm.checked) {
                 gender = maleElm.value
             } else if(famaleElm.checked) {
@@ -70,8 +70,42 @@ const App = {
             } else {
                 errorGender.innerHTML = ''
             }
-            
-            
+
+            if(fullNameElm && emailElm && phoneElm && gender) {
+
+                const students = []
+
+                const studentAll = {
+                    fullname: fullNameElm.value,
+                    email: emailElm.value,
+                    phone: phoneElm.value,
+                    gender: gender
+                }
+
+                students.push(studentAll)
+
+                students.forEach((student, index) => {
+                    const genderStudent = student.gender === 'male' ? 'Nam' : 'Nữ'
+                    index++
+                    const tableContent = `
+                        <tr>
+                            <td>${index}</td>
+                            <td>${student.fullname}</td>
+                            <td>${student.email}</td>
+                            <td>${student.phone}</td>
+                            <td>${genderStudent}</td>
+                            <td>
+                                <a href="">Edit</a>
+                                <a href="">Delete</a>
+                            </td>
+                        </tr>
+                    `
+
+                    document.querySelector('#list-students').innerHTML = tableContent
+                });
+            }
+
+             
         })
     }
 
