@@ -22,6 +22,7 @@ const validatePhone = (phone) => {
 const App = {
     init() {
         this.btnCreate()
+        // this.renderListStudent()
     },
 
     btnCreate() {
@@ -73,7 +74,7 @@ const App = {
 
             if(fullNameElm && emailElm && phoneElm && gender) {
 
-                const students = []
+                let students = localStorage.getItem('students') ? JSON.parse(localStorage.getItem('students')) : []
 
                 const studentAll = {
                     fullname: fullNameElm.value,
@@ -84,29 +85,45 @@ const App = {
 
                 students.push(studentAll)
 
-                students.forEach((student, index) => {
-                    const genderStudent = student.gender === 'male' ? 'Nam' : 'Nữ'
-                    index++
-                    const tableContent = `
-                        <tr>
-                            <td>${index}</td>
-                            <td>${student.fullname}</td>
-                            <td>${student.email}</td>
-                            <td>${student.phone}</td>
-                            <td>${genderStudent}</td>
-                            <td>
-                                <a href="">Edit</a>
-                                <a href="">Delete</a>
-                            </td>
-                        </tr>
-                    `
+                localStorage.setItem('students', JSON.stringify(students))
 
-                    document.querySelector('#list-students').innerHTML = tableContent
-                });
+                this.renderListStudent()
+
             }
 
              
         })
+    },
+
+    renderListStudent() {
+        let students = localStorage.getItem('students') ? JSON.parse(localStorage.getItem('students')) : []
+
+        if(students.length === 0) {
+            document.querySelector('#list-students').style.display = 'none'
+            return false
+        }
+
+        document.querySelector('#list-students').style.display = 'block'
+
+        let tableContent = ''
+        students.forEach((student, index) => {
+            let genderStudent = student.gender === 'male' ? 'Nam' : 'Nữ'
+            index++
+            tableContent += `
+                <tr>
+                    <td>${index}</td>
+                    <td>${student.fullname}</td>
+                    <td>${student.email}</td>
+                    <td>${student.phone}</td>
+                    <td>${genderStudent}</td>
+                    <td>
+                        <a href="">Edit</a>
+                        <a href="">Delete</a>
+                    </td>
+                </tr>`
+            });
+
+            document.querySelector('#list-students').innerHTML = tableContent
     }
 
 }
