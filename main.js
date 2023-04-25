@@ -12,7 +12,7 @@ const errorPhone  = document.querySelector('#phone-error')
 const errorGender = document.querySelector('#gender-error')
 
 const validateEmail = (email) => {
-    return /^(([^<a>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(email)
+    return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
 };
 
 const validatePhone = (phone) => {
@@ -22,13 +22,12 @@ const validatePhone = (phone) => {
 const App = {
     init() {
         this.btnCreate()
-        // this.renderListStudent()
+        this.renderListStudent()
+        // this.deleteStudent()
     },
 
     btnCreate() {
-        btnSave.addEventListener('click', function(event) {
-            event.preventDefault()
-
+        btnSave.addEventListener('click', function() {
             // check checked
             let gender = ''
             if(maleElm.checked) {
@@ -87,28 +86,24 @@ const App = {
 
                 localStorage.setItem('students', JSON.stringify(students))
 
-                this.renderListStudent()
+                // location.reload()
 
+                this.renderListStudent(students)
+                this.clear()
             }
 
-             
+
         })
     },
 
     renderListStudent() {
         let students = localStorage.getItem('students') ? JSON.parse(localStorage.getItem('students')) : []
 
-        if(students.length === 0) {
-            document.querySelector('#list-students').style.display = 'none'
-            return false
-        }
-
-        document.querySelector('#list-students').style.display = 'block'
-
         let tableContent = ''
+
         students.forEach((student, index) => {
-            let genderStudent = student.gender === 'male' ? 'Nam' : 'Nữ'
             index++
+            let genderStudent = student.gender === 'male' ? 'Nam' : 'Nữ'
             tableContent += `
                 <tr>
                     <td>${index}</td>
@@ -117,14 +112,28 @@ const App = {
                     <td>${student.phone}</td>
                     <td>${genderStudent}</td>
                     <td>
-                        <a href="">Edit</a>
-                        <a href="">Delete</a>
+                        <a href="#">Edit</a>
+                        <a href="#" onclick="deleteStudent()">Delete</a>
                     </td>
                 </tr>`
             });
 
             document.querySelector('#list-students').innerHTML = tableContent
+    },
+
+    clear() {
+        fullNameElm.value = ''
+        emailElm.value = ''
+        phoneElm.value = ''
     }
+
+    // deleteStudent() {
+    //     btnDel.addEventListener('click', function() {
+    //         let students = localStorage.getItem('students') ? JSON.parse(localStorage.getItem('students')) : []
+
+    //         console.log(students);
+    //     }) 
+    // }
 
 }
 
