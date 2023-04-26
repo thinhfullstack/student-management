@@ -18,7 +18,7 @@
         </div>
         <div class="mb-3">
             <label for="email" class="form-label">Email:</label>
-            <input type="text" class="form-control" id="email" placeholder="Nhập email của bạn...">
+            <input type="email" class="form-control" id="email" placeholder="Nhập email của bạn...">
             <span id="email-error" class="error"></span>
         </div>
         <div class="mb-3">
@@ -71,7 +71,22 @@
             <tbody id="list-students">
                 
             </tbody>
+
         </table>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-end">
+              <li class="page-item btn-previous">
+                  <span class="page-link cursor-pointer" aria-label="Previous" aria-hidden="true">&laquo;</span>
+              </li>
+              <div id="number-page" class="number-page d-flex cursor-pointer">
+
+              </div>
+              <li class="page-item btn-next">
+                  <span class="page-link cursor-pointer" aria-label="Next" aria-hidden="true">&raquo;</span>
+              </li>
+            </ul>
+        </nav>
+        <!-- <div id="pagination"></div> -->
     </div>
     <!-- Lodash -->
     <!-- <script src='https://cdn.jsdelivr.net/g/lodash@4(lodash.min.js+lodash.fp.min.js)'></script> -->

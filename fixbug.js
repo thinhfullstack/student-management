@@ -11,16 +11,25 @@ let errorEmail  = document.querySelector('#email-error')
 let errorPhone  = document.querySelector('#phone-error')
 let errorGender = document.querySelector('#gender-error')
 
+// pagination
+let students = localStorageStudentManagement()
+
+let currentPage = 1
+let perPage = 5
+let startPage = 0
+let endPage = perPage
+let totalPage = Math.ceil(students.length / perPage)
+
+let btnNext = document.querySelector('.btn-next')
+let btnPrevious = document.querySelector('.btn-previous')
 
 let validateEmail = (email) => {
-    return /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)
+    return /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(email)
 };
 
 let validatePhone = (phone) => {
     return /^[(]{0,1}[0-9]{3}[)]{0,1}[-\s\.]{0,1}[0-9]{3}[-\s\.]{0,1}[0-9]{4}$/.test(phone)
 }
-
-let localStorageItem = localStorage.getItem('students') ? JSON.parse(localStorage.getItem('students')) : []
 
 btnSave.addEventListener('click', function() {
     // check checked
@@ -66,11 +75,11 @@ btnSave.addEventListener('click', function() {
         errorGender.innerHTML = ''
     }
 
-    if(fullNameElm.value && emailElm.value && phoneElm.value && gender) {
+    if(fullNameElm && emailElm && phoneElm && gender) {
 
         let studentIds = this.getAttribute('id')
         
-        let students  = localStorageItem
+        let students  = localStorageStudentManagement()
 
         let studentAll = {
             fullname: fullNameElm.value,
@@ -83,42 +92,92 @@ btnSave.addEventListener('click', function() {
             students[studentIds] = studentAll
             this.removeAttribute('id')
         } else {
-            // console.log(studentIds);
             students.push(studentAll)
-        }
+        } 
             
         clearForm()
 
         localStorage.setItem('students', JSON.stringify(students))
-        renderListStudent(students)
+        // renderPageNumber()
+        if(students) {
+            renderListStudent(students)
+            alert('Thành công!')
+        }
     }
 })
 
 function renderListStudent() {
-    let students = localStorageItem
+    let students = localStorageStudentManagement()
 
     let tableContent = ''
 
-    students.forEach((student, index) => {
-        let studentId = index
-        let genderStudent = student.gender === 'male' ? 'Nam' : 'Nữ'
-        index++
-        tableContent += `
-            <tr>
-                <td>${index}</td>
-                <td>${student.fullname}</td>
-                <td>${student.email}</td>
-                <td>${student.phone}</td>
-                <td>${genderStudent}</td>
-                <td>
-                    <a href="#" onclick="editStudent(${studentId})">Edit</a>
-                    <a href="#" onclick="deleteStudent(${studentId})">Delete</a>
-                </td>
-            </tr>`
-        });
+    students.map((student, index) => {
+        if(index >= startPage && index < endPage) {
+            let studentId = index
+            let genderStudent = student.gender === 'male' ? 'Nam' : 'Nữ'
+            index++
+            tableContent += `
+                <tr>
+                    <td>${index}</td>
+                    <td>${student.fullname}</td>
+                    <td>${student.email}</td>
+                    <td>${student.phone}</td>
+                    <td>${genderStudent}</td>
+                    <td>
+                        <a href="#" onclick="editStudent(${studentId})">Edit</a>
+                        <a href="#" onclick="deleteStudent(${studentId})">Delete</a>
+                    </td>
+                </tr>`
+        }
+    });
 
         document.querySelector('#list-students').innerHTML = tableContent
 }
+
+btnNext.addEventListener('click', () => {
+    currentPage++
+    if(currentPage > totalPage) {
+        currentPage = totalPage
+    }
+
+    getCurrentPage(currentPage)
+
+    renderListStudent()
+})
+
+btnPrevious.addEventListener('click', () => {
+    currentPage--
+    if(currentPage <= 1) {
+        currentPage = 1
+    }
+
+    getCurrentPage(currentPage)
+
+    renderListStudent()
+})
+
+function renderListPage() {
+    let html = ''
+    html += `<li class="page-item"><span class="page-link">${1}</span></li>`
+    for(let i = 2; i <= totalPage; i++) {
+        html += `<li class="page-item"><span class="page-link">${i}</span></li>`
+    }
+    document.querySelector('#number-page').innerHTML = html
+}
+renderListPage()
+
+function changePage() {
+    const chanePage = document.querySelectorAll('.number-page li')
+    for(let i = 0; i < chanePage.length; i++) {
+        chanePage[i].addEventListener('click', () => {
+            let value = i + 1
+            currentPage = value
+            getCurrentPage(currentPage)
+            renderListStudent()
+        })
+    }
+}
+changePage()
 
 function clearForm() {
     fullNameElm.value = ''
@@ -128,20 +187,23 @@ function clearForm() {
 
 
 function deleteStudent(id) {
-    if(confirm('Bạn có muốn xoá dòng này không?')) {
-        let students = localStorageItem
+    if(confirm('Bạn có muốn xoá sinh viên này không?')) {
+        let students = localStorageStudentManagement()
         
         students.splice(id, 1)
 
         localStorage.setItem('students', JSON.stringify(students))
 
-        renderListStudent(students)
+        if(students) {
+            alert('Xoá sinh viên thành công!')
+            renderListStudent(students)
+        }
 
     }
 }
 
 function editStudent(id) {
-    let students = localStorageItem
+    let students = localStorageStudentManagement()
 
     if(students.length > 0) {
         fullNameElm.value = students[id].fullname
@@ -149,7 +211,7 @@ function editStudent(id) {
         phoneElm.value = students[id].phone
         gender = students[id].gender
 
-        if(confirm('Ban co muon sua khong')) {
+        if(confirm('Bạn có muốn sửa không!')) {
             btnSave.setAttribute('id', id)
         }
 
@@ -157,3 +219,11 @@ function editStudent(id) {
 
 }
 
+function localStorageStudentManagement() {
+    return localStorage.getItem('students') ? JSON.parse(localStorage.getItem('students')) : []
+}
+
+function getCurrentPage(currentPage) {
+    startPage = (currentPage - 1) * perPage
+    endPage  = currentPage * perPage
+}
